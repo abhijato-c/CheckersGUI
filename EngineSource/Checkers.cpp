@@ -37,6 +37,21 @@ int main(){
     string line;
     checkers brd;
 
+    brd.wp = 11163050ULL;
+    brd.wk = 0ULL;
+    brd.bp = 6172839697753047040ULL;
+    brd.bk = 0ULL;
+    brd.chain = -1;
+    brd.turn = true;
+
+    brd.bpcs = brd.bp | brd.bk;
+    brd.wpcs = brd.wp | brd.wk;
+    brd.pieces = brd.bpcs | brd.wpcs;
+
+    /*for (auto m : LegalMoves(brd)) {
+        cout << MoveToStr(m) << endl;
+    }*/
+
     while (getline(cin, line)) {
         StopSearch();
 
@@ -49,12 +64,16 @@ int main(){
 
         if (cmd == "isready") {cout << "readyok" << endl;} 
         else if (cmd == "position") {
-            brd.wp = stoll(command[1]);
-            brd.wk = stoll(command[2]);
-            brd.bp = stoll(command[3]);
-            brd.bk = stoll(command[4]);
+            brd.wp = stoull(command[1]);
+            brd.wk = stoull(command[2]);
+            brd.bp = stoull(command[3]);
+            brd.bk = stoull(command[4]);
             brd.chain = stoi(command[5]);
             brd.turn = command[6] == "w";
+
+            brd.bpcs = brd.bp | brd.bk;
+            brd.wpcs = brd.wp | brd.wk;
+            brd.pieces = brd.bpcs | brd.wpcs;
         } 
         else if (cmd == "go") {
             string sub;

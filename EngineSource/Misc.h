@@ -15,10 +15,10 @@ inline string MoveToStr(const Move move){
     int to = ((move>>6) & 63);
     string MoveStr = "";
 
-    MoveStr += (7 - from%8); // From file
-    MoveStr += from / 8;     // From rank
-    MoveStr += (7 - to % 8); // To file
-    MoveStr += to / 8;       // To rank
+    MoveStr += to_string(7 - from%8); // From file
+    MoveStr += to_string(from / 8);   // From rank
+    MoveStr += to_string(7 - to % 8); // To file
+    MoveStr += to_string(to / 8);     // To rank
 
     return MoveStr;
 }

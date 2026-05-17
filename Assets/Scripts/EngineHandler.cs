@@ -9,9 +9,9 @@ public class EngineHandler{
 
     public void Start() {
         // Determine the correct binary path depending on the operating system
-        string binaryName = "CheckersEngine.exe";
+        string binaryName = "Checkers.exe";
         #if UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX
-            binaryName = "CheckersEngine";
+            binaryName = "Checkers";
         #endif
         string binaryPath = Path.Combine(Application.streamingAssetsPath, binaryName);
 
@@ -58,7 +58,7 @@ public class EngineHandler{
     }
 
     public void GetMove(ulong wp, ulong bp, ulong wk, ulong bk, bool turn, int chain) {
-        string positionCommand = $"position {wp} {bp} {wk} {bk} {chain} {(turn ? "w" : "b")}";
+        string positionCommand = $"position {wp} {wk} {bp} {bk} {chain} {(turn ? "w" : "b")}";
         SendCommand(positionCommand);
         SendCommand("go movetime 1000");
     }

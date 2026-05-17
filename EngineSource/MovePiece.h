@@ -10,7 +10,7 @@ inline void MoveWhitePiece(Move& mv, checkers &b){
     Bitboard cap = (1ULL << ((ctz(f) + ctz(to)) / 2));
 
     // Capture
-    switch((mv >> 13) & 2){
+    switch((mv >> 13) & 3){
         case 1:
             b.bp &= ~cap;
             break;
@@ -45,7 +45,7 @@ inline void MoveBlackPiece(Move& mv, checkers &b){
     Bitboard cap = (1ULL << ((ctz(f) + ctz(to)) / 2));
 
     // Capture
-    switch((mv >> 13) & 2){
+    switch((mv >> 13) & 3){
         case 1:
             b.wp &= ~cap;
             break;
@@ -86,7 +86,8 @@ inline void MovePiece(Move& mv, checkers &b){
     mv |= (b.chain + 1) << 17;
 
     // Chain
-    if ((mv >> 13) & 2){
+    b.chain = -1;
+    if ((mv >> 13) & 3){
         MoveList chains;
         int to = ((mv >> 6) & 63);
         if (b.turn){
@@ -102,13 +103,12 @@ inline void MovePiece(Move& mv, checkers &b){
                 chains = BPchain(b, to);
         }
 
-        if (chains.size() > 0)
-            b.chain = to;
-        else {
-            b.chain = -1;
+        if (chains.size() > 0){
+            b.chain = to;   
             b.turn = !b.turn;
         }
     }
+    b.turn = !b.turn;
 }
 
 inline void UnMoveWhite(const Move mv, checkers &b){
@@ -130,12 +130,11 @@ inline void UnMoveWhite(const Move mv, checkers &b){
      
     // Undo promotion
     if ((mv >> 15) & 1){
-        b.wp |= to;
         b.wk &= ~to;
     }
 
     // Undo capture
-    switch((mv >> 13) & 2){
+    switch((mv >> 13) & 3){
         case 1:
             b.bp |= cap;
             break;
@@ -164,12 +163,11 @@ inline void UnMoveBlack(const Move mv, checkers &b){
      
     // Undo promotion
     if ((mv >> 15) & 1){
-        b.bp |= to;
         b.bk &= ~to;
     }
 
     // Undo capture
-    switch((mv >> 13) & 2){
+    switch((mv >> 13) & 3){
         case 1:
             b.wp |= cap;
             break;
@@ -180,8 +178,8 @@ inline void UnMoveBlack(const Move mv, checkers &b){
 }
 
 inline void UnmovePiece(const Move mv, checkers &b){
-    if (b.turn) UnMoveBlack(mv, b);
-    else UnMoveWhite(mv, b);
+    if ((mv >> 16) & 1) UnMoveWhite(mv, b);
+    else UnMoveBlack(mv, b);
 
     b.bpcs = b.bp|b.bk;
     b.wpcs = b.wp|b.wk;

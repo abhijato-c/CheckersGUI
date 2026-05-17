@@ -9,9 +9,10 @@
 inline int MiniMax(checkers &b, int depth, int alpha, int beta, timept start = chrono::high_resolution_clock::now(), int64_t time = INT64_MAX){
     //check for game over, higher eval for delayed checkmate
     if(b.wpcs == 0 || b.bpcs == 0) return (-inf + 30 - depth);
-    if(depth == 1) return StaticEval(b);
+    if(depth <= 1) return StaticEval(b);
 
     MoveList Moves = LegalMoves(b);
+    if (Moves.size() == 0) return (-inf + 30 - depth);
 
     // Compute static evals of each position for move ordering
     int StaticEvals[Moves.size()];
@@ -20,7 +21,7 @@ inline int MiniMax(checkers &b, int depth, int alpha, int beta, timept start = c
         int score = 0;
     
         // Capture check
-        if ((m << 13) & 2){
+        if ((m >> 13) & 3){
             score += 100;
         }
         // Promotions
@@ -71,7 +72,7 @@ inline Move IterativeDeepening(checkers &b, int64_t time, int Mdepth){
             int score = 0;
         
             // Capture check
-            if ((m << 13) & 2){
+            if ((m >> 13) & 3){
                 score += 100;
             }
             // Promotions
