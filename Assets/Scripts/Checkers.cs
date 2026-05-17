@@ -41,14 +41,14 @@ public class Checkers {
     Bitboard mask_1=255UL;
 
     public Bitboard wp = 0; public Bitboard bp = 0; public Bitboard wk = 0; public Bitboard bk = 0;
-    public Bitboard wpcs = 0; public Bitboard bpcs = 0; public Bitboard pieces = 0;
+    public Bitboard wpcs = 0; public Bitboard bpcs = 0; public Bitboard pieces = 0; public int chain = -1;
     public bool turn=true;
     public int ctz(Bitboard brd) {return math.tzcnt(brd);}
     public int popcnt(Bitboard brd) {return math.countbits(brd);}
 
     public void ResetBoard(){
         wp = 11163050UL; bp = 6172839697753047040UL; wk = 0; bk = 0;
-        wpcs = wp | wk; bpcs = bp | bk; pieces = wpcs | bpcs; turn = true;
+        wpcs = wp | wk; bpcs = bp | bk; pieces = wpcs | bpcs; turn = true; chain = -1;
     }
 
     public void WPmoves(int i, ref List<Move> Moves){
@@ -117,6 +117,29 @@ public class Checkers {
 
     public List<Move> GenerateMoves(){
         List<Move> Moves = new List<Move>();
+        if (chain != -1){
+            Bitboard bb = 1UL << chain;
+            if (turn){
+                if ((bb & wp) != 0)
+                    WPmoves(chain, ref Moves);
+                else
+                    WKmoves(chain, ref Moves);
+            }
+            else {
+                if ((bb & bp) != 0)
+                    BPmoves(chain, ref Moves);
+                else
+                    BKmoves(chain, ref Moves);
+            }
+
+            List<Move> caps = new List<Move>();
+            foreach (Move move in Moves){
+                if ((move >> 12) != 0)
+                    caps.Add(move);
+            }
+            return caps;
+        }
+
         Bitboard temp;
         int i;
 
@@ -207,12 +230,16 @@ public class Checkers {
         pieces = wp | bp | wk | bk;
         wpcs = wp | wk;
         bpcs = bp | bk;
+        chain = -1;
 
         if (move >> 12 != 0) {
             List<Move> PLmoves = GenerateMoves();
             foreach (Move m in PLmoves) {
                 if ((m >> 12) == 0) break;
-                if ((m & 63) == ((move >> 6) & 63)) return;
+                if ((m & 63) == ((move >> 6) & 63)){
+                    chain = m & 63;
+                    return;
+                }
             }
         }
         turn = !turn;

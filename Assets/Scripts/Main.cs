@@ -30,6 +30,9 @@ public class Main : MonoBehaviour {
     public float speed = 0.2f;
     public float scale = 0.8f;
 
+    EngineHandler Engine = new EngineHandler();
+    bool OppIsComputer;
+    bool ComputerColor;
     bool IsActive = true;
     bool chain = false;
     GameObject[,] Pieces = new GameObject[8,8];
@@ -99,7 +102,7 @@ public class Main : MonoBehaviour {
     }
 
     public void PieceClicked(Vector2Int pos, bool color) {
-        if (color != board.turn || !IsActive) return;
+        if (color != board.turn || !IsActive || (OppIsComputer && board.turn == ComputerColor)) return;
         DestroySelectors();
         List<Vector2Int> moves = GetValidMoves(pos);
         foreach (Vector2Int move in moves) {
@@ -187,6 +190,10 @@ public class Main : MonoBehaviour {
             }
         }
         else { chain = true; }
+
+        if (OppIsComputer && board.turn == ComputerColor) {
+            PlayComputerMove();
+        }
     }
 
     public bool IsCaptureMove(Vector2Int from, Vector2Int to) {
@@ -205,6 +212,14 @@ public class Main : MonoBehaviour {
     }
 
     public void NewGame(string p1Name, string p2Name, int time, int increment, bool opponentIsPlayer){
+        if (opponentIsPlayer) {
+            OppIsComputer = false;
+        }
+        else {
+            OppIsComputer = true;
+            ComputerColor = false;
+        }
+
         ResetBoard();
         IsActive = true;
 
@@ -223,6 +238,25 @@ public class Main : MonoBehaviour {
         WhiteStats.StartTimer();
     }
 
+    public void PlayComputerMove() {
+        Engine.GetMove(board.wp, board.bp, board.wk, board.bk, board.turn, board.chain);
+    }
+
+    public void ProcessEngineMove(string move) {
+        if (!IsActive) return;
+
+        int FromFile = move[0] - '0';
+        int FromRank = move[1] - '0';
+        int ToFile = move[2] - '0';
+        int ToRank = move[3] - '0';
+
+        Vector2Int fromPos = new Vector2Int(FromFile, FromRank);
+        Vector2Int toPos = new Vector2Int(ToFile, ToRank);
+        bool isCapture = math.abs(fromPos.x - toPos.x) != 1;
+
+        SelectorClicked(fromPos, toPos, isCapture);
+    }
+
     public void TimeOut(bool isWhite) {
         OpenGameOverDialog(true, !isWhite);
     }
@@ -235,5 +269,10 @@ public class Main : MonoBehaviour {
     void Start() {
         GenerateBoard(LightSquareColor, DarkSquareColor);
         ResetBoard();
+        Engine.Start();
+    }
+
+    public void OnApplicationQuit() {
+        Engine.Quit();
     }
 }
