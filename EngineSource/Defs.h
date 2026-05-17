@@ -22,6 +22,8 @@ Move encoding
 12    : from piece     (0=P 1=K)
 13-14 : captured piece (0=N 1=P 2=K)
 15    : promotion      (0=N 1=Y)
+16    : prev turn      (0=B 1=W)
+17-23 : prev chain + 1
 */
 
 extern atomic<bool> StopSignal;

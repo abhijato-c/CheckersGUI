@@ -82,6 +82,9 @@ inline void MovePiece(Move& mv, checkers &b){
     b.wpcs = b.wp|b.wk;
     b.pieces = b.bpcs|b.wpcs;
 
+    mv |= ((int) b.turn) << 16;
+    mv |= (b.chain + 1) << 17;
+
     // Chain
     if ((mv >> 13) & 2){
         MoveList chains;
@@ -111,29 +114,69 @@ inline void MovePiece(Move& mv, checkers &b){
 inline void UnMoveWhite(const Move mv, checkers &b){
     Bitboard f = (1ULL << (mv & 63));
     Bitboard to = (1ULL << ((mv>>6) & 63));
+    Bitboard cap = (1ULL << ((ctz(f) + ctz(to)) / 2));
 
     // Move back piece
-    
+    switch((mv >> 12) & 1){
+        case 0:
+            b.wp |= f;
+            b.wp &= ~to;
+            break;
+        case 1:
+            b.wk |= f;
+            b.wk &= ~to;
+            break;
+    }
      
     // Undo promotion
-    
+    if ((mv >> 15) & 1){
+        b.wp |= to;
+        b.wk &= ~to;
+    }
 
     // Undo capture
-    
+    switch((mv >> 13) & 2){
+        case 1:
+            b.bp |= cap;
+            break;
+        case 2:
+            b.bk |= cap;
+            break;
+    }
 }
 
 inline void UnMoveBlack(const Move mv, checkers &b){
     Bitboard f = (1ULL << (mv & 63));
     Bitboard to = (1ULL << ((mv>>6) & 63));
+    Bitboard cap = (1ULL << ((ctz(f) + ctz(to)) / 2));
 
     // Move back piece
-    
+    switch((mv >> 12) & 1){
+        case 0:
+            b.bp |= f;
+            b.bp &= ~to;
+            break;
+        case 1:
+            b.bk |= f;
+            b.bk &= ~to;
+            break;
+    }
      
     // Undo promotion
-    
+    if ((mv >> 15) & 1){
+        b.bp |= to;
+        b.bk &= ~to;
+    }
 
     // Undo capture
-    
+    switch((mv >> 13) & 2){
+        case 1:
+            b.wp |= cap;
+            break;
+        case 2:
+            b.wk |= cap;
+            break;
+    }
 }
 
 inline void UnmovePiece(const Move mv, checkers &b){
@@ -143,6 +186,9 @@ inline void UnmovePiece(const Move mv, checkers &b){
     b.bpcs = b.bp|b.bk;
     b.wpcs = b.wp|b.wk;
     b.pieces = b.bpcs|b.wpcs;
+
+    b.turn = (mv >> 16) & 1;
+    b.chain = ((mv >> 17) & 127) - 1;
 }
 
 #endif
