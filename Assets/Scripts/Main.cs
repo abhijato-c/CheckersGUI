@@ -273,6 +273,6 @@ public class Main : MonoBehaviour {
     }
 
     public void OnApplicationQuit() {
-        Engine.Quit();
+        Engine.Kill();
     }
 }

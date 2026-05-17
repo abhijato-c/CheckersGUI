@@ -6,7 +6,6 @@ public class Piece : MonoBehaviour, IPointerClickHandler {
     public Sprite BlackTexture;
 
     bool color;
-    bool king;
     Vector2Int pos;
     Vector3 target;
     public void Spawn(Vector2Int pos, bool color) {
