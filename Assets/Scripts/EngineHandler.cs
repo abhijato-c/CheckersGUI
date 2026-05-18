@@ -53,10 +53,10 @@ public class EngineHandler{
         }
     }
 
-    public void GetMove(ulong wp, ulong bp, ulong wk, ulong bk, bool turn, int chain) {
+    public string GetMove(ulong wp, ulong bp, ulong wk, ulong bk, bool turn, int chain) {
         if (Input == null) {
             UnityEngine.Debug.LogError("Engine input stream is not initialized.");
-            return;
+            return null;
         }
         string positionCommand = $"position {wp} {wk} {bp} {bk} {chain} {(turn ? "w" : "b")}";
         SendCommand(positionCommand);
@@ -68,10 +68,10 @@ public class EngineHandler{
             if (line.StartsWith("bestmove")) {
                 string move = line.Split(' ')[1];
                 UnityEngine.Debug.Log($"Engine wants to move: {move}");
-                Main.Instance.ProcessEngineMove(move);
-                break;
+                return move;
             }
         }
+        return null;
     }
 
     public void Kill(){

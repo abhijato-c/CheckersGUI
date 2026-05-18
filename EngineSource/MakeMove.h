@@ -64,6 +64,7 @@ inline Move IterativeDeepening(checkers &b, int64_t time, int Mdepth){
         int alpha = -inf;
         int beta = inf;
         MoveList Moves = LegalMoves(b);
+        if (Moves.size() == 1) return Moves[0];
 
         // Compute static evals of each position for move ordering
         int StaticEvals[Moves.size()];

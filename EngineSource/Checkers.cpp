@@ -37,21 +37,6 @@ int main(){
     string line;
     checkers brd;
 
-    brd.wp = 11163050ULL;
-    brd.wk = 0ULL;
-    brd.bp = 6172839697753047040ULL;
-    brd.bk = 0ULL;
-    brd.chain = -1;
-    brd.turn = true;
-
-    brd.bpcs = brd.bp | brd.bk;
-    brd.wpcs = brd.wp | brd.wk;
-    brd.pieces = brd.bpcs | brd.wpcs;
-
-    /*for (auto m : LegalMoves(brd)) {
-        cout << MoveToStr(m) << endl;
-    }*/
-
     while (getline(cin, line)) {
         StopSearch();
 

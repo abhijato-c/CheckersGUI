@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Move = System.Int32;
 using TMPro;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class Main : MonoBehaviour {
     public static Main Instance { get; private set; }
@@ -163,11 +164,6 @@ public class Main : MonoBehaviour {
             }
         }
 
-        if (board.IsGameOver()) {
-            bool winner = board.GetWinner();
-            OpenGameOverDialog(true, winner);
-        }
-
         // Move History
         if (!chain) {
             GameObject entry = Instantiate(MoveHistoryPrefab, MoveHistoryFolder.transform);
@@ -191,7 +187,12 @@ public class Main : MonoBehaviour {
         }
         else { chain = true; }
 
-        if (OppIsComputer && board.turn == ComputerColor) {
+        if (board.IsGameOver()) {
+            bool winner = board.GetWinner();
+            OpenGameOverDialog(true, winner);
+        }
+
+        if (OppIsComputer && board.turn == ComputerColor && IsActive) {
             PlayComputerMove();
         }
     }
@@ -238,13 +239,11 @@ public class Main : MonoBehaviour {
         WhiteStats.StartTimer();
     }
 
-    public void PlayComputerMove() {
-        Engine.GetMove(board.wp, board.bp, board.wk, board.bk, board.turn, board.chain);
-    }
-
-    public void ProcessEngineMove(string move) {
-        if (!IsActive) return;
-
+    public async void PlayComputerMove() {
+        string move = await Task.Run(() => {
+            return Engine.GetMove(board.wp, board.bp, board.wk, board.bk, board.turn, board.chain);
+        });
+    
         int FromFile = move[0] - '0';
         int FromRank = move[1] - '0';
         int ToFile = move[2] - '0';
